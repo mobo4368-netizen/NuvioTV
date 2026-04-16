@@ -322,6 +322,44 @@ fun HeroContentSection(
                     }
 
                     MetaInfoRow(meta = meta, hideImdbRating = hideMetaInfoImdb, showFullReleaseDate = showFullReleaseDate)
+
+                    if (meta.budget != null && meta.budget > 0) {
+                        val currFormat = remember { 
+                            java.text.NumberFormat.getCurrencyInstance(java.util.Locale.US).apply { maximumFractionDigits = 0 }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Budget",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = NuvioTheme.extendedColors.textSecondary
+                                )
+                                Text(
+                                    text = currFormat.format(meta.budget),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = NuvioColors.TextPrimary
+                                )
+                            }
+                            if (meta.revenue != null && meta.revenue > 0) {
+                                Column {
+                                    Text(
+                                        text = "Revenue",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = NuvioTheme.extendedColors.textSecondary
+                                    )
+                                    Text(
+                                        text = currFormat.format(meta.revenue),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = NuvioColors.TextPrimary
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -622,15 +660,9 @@ private fun MetaInfoRow(
         }
     }
     Log.d("HeroBadge", "name=${meta.name} ageRating=${meta.ageRating} status=${meta.status} ageRatingBadge=$ageRatingBadge statusBadge=$statusBadge")
-    val secondaryItems = remember(runtimeText, meta.country, meta.language, meta.budget) {
+    val secondaryItems = remember(runtimeText, meta.country, meta.language) {
         buildList<String> {
             runtimeText?.takeIf { it.isNotBlank() }?.let { add(it) }
-            
-            meta.budget?.takeIf { it > 0 }?.let { budget ->
-                val format = java.text.NumberFormat.getCurrencyInstance(java.util.Locale.US)
-                format.maximumFractionDigits = 0
-                add("Budget: ${format.format(budget)}")
-            }
 
             meta.country?.trim()?.takeIf { it.isNotBlank() }?.let { add(normalizeCountryLabel(it)) }
             meta.language?.trim()?.takeIf { it.isNotBlank() }?.let { add(it.uppercase()) }
